@@ -1,0 +1,48 @@
+# Core dependencies
+torch>=2.0.0
+transformers>=4.30.0
+tokenizers>=0.13.0
+accelerate>=0.20.0
+
+# CLI and UI
+rich>=13.0.0
+click>=8.1.0
+typer>=0.9.0
+
+# Async and concurrency
+asyncio-mqtt>=0.11.0
+aiofiles>=23.0.0
+
+# Performance monitoring
+psutil>=5.9.0
+GPUtil>=1.4.0
+pynvml>=11.5.0
+
+# Distributed computing
+mpi4py>=3.1.0
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.11.0
+pytest-cov>=4.1.0
+pytest-benchmark>=4.0.0
+
+# Development tools
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.4.0
+pre-commit>=3.3.0
+
+# Serialization and data
+numpy>=1.24.0
+pandas>=2.0.0
+msgpack>=1.0.0
+
+# Logging and monitoring
+structlog>=23.1.0
+prometheus-client>=0.17.0
+
+# Optional GPU acceleration (CPU-only versions for compatibility)
+# For full GPU support, install CUDA versions separately
+--extra-index-url https://download.pytorch.org/whl/cpu 
