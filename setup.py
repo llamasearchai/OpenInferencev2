@@ -32,7 +32,7 @@ setup(
     description="High-Performance Distributed LLM Inference Engine",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/nikjois/openinferencev2",
+    url="https://github.com/llamasearchai/OpenInferencev2",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -60,8 +60,8 @@ setup(
     zip_safe=False,
     keywords="llm, inference, pytorch, cuda, distributed, optimization",
     project_urls={
-        "Bug Reports": "https://github.com/nikjois/openinferencev2/issues",
-        "Source": "https://github.com/nikjois/openinferencev2",
-        "Documentation": "https://github.com/nikjois/openinferencev2/blob/main/README.md",
+        "Bug Reports": "https://github.com/llamasearchai/OpenInferencev2/issues",
+        "Source": "https://github.com/llamasearchai/OpenInferencev2",
+        "Documentation": "https://github.com/llamasearchai/OpenInferencev2/blob/main/README.md",
     },
 ) 

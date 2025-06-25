@@ -1,0 +1,323 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openinferencev2
+  namespace: ai-inference
+  labels:
+    app: openinferencev2
+    tier: production
+    version: v2.0.0
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    description: "High-Performance Distributed LLM Inference Engine"
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: openinferencev2
+      tier: production
+  template:
+    metadata:
+      labels:
+        app: openinferencev2
+        tier: production
+        version: v2.0.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: openinferencev2
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      
+      # Node selection for GPU nodes
+      nodeSelector:
+        accelerator: nvidia-tesla-a100
+        node-type: gpu-optimized
+      
+      # Tolerations for GPU nodes
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
+      
+      # Affinity rules for optimal placement
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - openinferencev2
+              topologyKey: kubernetes.io/hostname
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: accelerator
+                operator: In
+                values:
+                - nvidia-tesla-a100
+                - nvidia-tesla-v100
+      
+      # Init containers for setup
+      initContainers:
+      - name: model-downloader
+        image: busybox:1.35
+        command:
+        - sh
+        - -c
+        - |
+          echo "Downloading model files..."
+          # wget -O /models/model.bin $MODEL_URL
+          echo "Model download completed"
+        volumeMounts:
+        - name: model-storage
+          mountPath: /models
+        env:
+        - name: MODEL_URL
+          valueFrom:
+            configMapKeyRef:
+              name: openinferencev2-config
+              key: model_url
+      
+      containers:
+      - name: openinferencev2
+        image: ghcr.io/llamasearchai/openinferencev2:latest
+        imagePullPolicy: Always
+        
+        # Resource requirements
+        resources:
+          requests:
+            memory: "16Gi"
+            cpu: "4"
+            nvidia.com/gpu: 2
+          limits:
+            memory: "32Gi"
+            cpu: "8"
+            nvidia.com/gpu: 2
+        
+        # Environment variables
+        env:
+        - name: MODEL_PATH
+          value: "/models/llama-70b"
+        - name: MAX_BATCH_SIZE
+          value: "64"
+        - name: NUM_GPUS
+          value: "2"
+        - name: TENSOR_PARALLEL_SIZE
+          value: "2"
+        - name: USE_FP16
+          value: "true"
+        - name: USE_FLASH_ATTENTION
+          value: "true"
+        - name: CUDA_VISIBLE_DEVICES
+          value: "all"
+        - name: PROMETHEUS_PORT
+          value: "9090"
+        - name: LOG_LEVEL
+          value: "INFO"
+        - name: ENVIRONMENT
+          value: "production"
+        
+        # Ports
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        
+        # Health checks
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+          successThreshold: 1
+        
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        
+        # Startup probe for slow initialization
+        startupProbe:
+          httpGet:
+            path: /health
+            port: http
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+          successThreshold: 1
+        
+        # Volume mounts
+        volumeMounts:
+        - name: model-storage
+          mountPath: /models
+          readOnly: true
+        - name: cache-storage
+          mountPath: /app/cache
+        - name: logs-storage
+          mountPath: /app/logs
+        - name: config-volume
+          mountPath: /app/config
+          readOnly: true
+        - name: secrets-volume
+          mountPath: /app/secrets
+          readOnly: true
+        
+        # Security context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+      
+      # Sidecar container for log collection
+      - name: log-collector
+        image: fluent/fluent-bit:2.1.10
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: logs-storage
+          mountPath: /app/logs
+          readOnly: true
+        - name: fluent-bit-config
+          mountPath: /fluent-bit/etc
+          readOnly: true
+      
+      # Volumes
+      volumes:
+      - name: model-storage
+        persistentVolumeClaim:
+          claimName: model-storage-pvc
+      - name: cache-storage
+        emptyDir:
+          sizeLimit: 8Gi
+      - name: logs-storage
+        emptyDir:
+          sizeLimit: 2Gi
+      - name: config-volume
+        configMap:
+          name: openinferencev2-config
+      - name: secrets-volume
+        secret:
+          secretName: openinferencev2-secrets
+      - name: fluent-bit-config
+        configMap:
+          name: fluent-bit-config
+      
+      # DNS configuration
+      dnsPolicy: ClusterFirst
+      
+      # Restart policy
+      restartPolicy: Always
+      
+      # Termination grace period
+      terminationGracePeriodSeconds: 60
+      
+      # Image pull secrets
+      imagePullSecrets:
+      - name: github-registry-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openinferencev2-service
+  namespace: ai-inference
+  labels:
+    app: openinferencev2
+    tier: production
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+spec:
+  type: LoadBalancer
+  selector:
+    app: openinferencev2
+    tier: production
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  - name: metrics
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 300
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: openinferencev2
+  namespace: ai-inference
+  labels:
+    app: openinferencev2
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/openinferencev2-role
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: openinferencev2-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["pods", "nodes"]
+  verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: openinferencev2-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: openinferencev2-role
+subjects:
+- kind: ServiceAccount
+  name: openinferencev2
+  namespace: ai-inference 
