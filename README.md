@@ -35,7 +35,7 @@ OpenInferencev2 represents the cutting edge of LLM inference technology, designe
 - **Custom CUDA Kernels**: Hand-optimized FlashAttention, fused FFN operations, and memory-efficient attention mechanisms
 - **Advanced Batching**: Intelligent dynamic batching with priority-based scheduling for optimal throughput
 - **Multi-GPU Scaling**: Tensor, pipeline, and MoE parallelism with near-linear scaling efficiency
-- **Memory Optimization**: Advanced KV cache management and memory pooling for 60% memory reduction
+- **Memory Optimization**: Advanced KV cache management and memory pooling for efficient resource utilization
 
 ### **Production Readiness**
 - **Comprehensive Monitoring**: Real-time performance metrics, alerting, and system health monitoring
@@ -51,18 +51,41 @@ OpenInferencev2 represents the cutting edge of LLM inference technology, designe
 
 ---
 
-## Performance Benchmarks
+## Real-World Benchmarking
 
-| Model Size | Batch Size | Throughput (tokens/s) | Latency P95 (ms) | Memory Usage (GB) | GPU Efficiency | FLOPS Utilization |
-|-----------|------------|----------------------|------------------|-------------------|----------------|-------------------|
-| **7B**    | 1          | **1,247**            | **18.3**         | 12.4              | 94.2%          | 87.3%             |
-| **7B**    | 32         | **15,892**           | **24.7**         | 14.8              | 97.8%          | 91.7%             |
-| **13B**   | 1          | **823**              | **28.9**         | 22.1              | 92.1%          | 84.9%             |
-| **13B**   | 16         | **8,934**            | **35.2**         | 24.9              | 95.4%          | 88.2%             |
-| **70B**   | 1          | **187**              | **142.7**        | 138.2             | 89.3%          | 82.1%             |
-| **70B**   | 8          | **1,248**            | **156.4**        | 144.8             | 93.7%          | 86.4%             |
+OpenInferencev2 includes a comprehensive benchmarking suite that uses actual open-source datasets from Hugging Face for accurate performance measurement:
 
-*Benchmarks conducted on NVIDIA A100 80GB GPUs with all optimizations enabled*
+```bash
+# Run comprehensive real-world benchmarks
+python test_real_benchmarks.py
+
+# Available benchmark datasets
+python -c "from benchmarks import DatasetBenchmark; print(list(DatasetBenchmark.AVAILABLE_DATASETS.keys()))"
+```
+
+### Benchmark Features
+- **Real Dataset Testing**: Uses WikiText-2, SQuAD, CNN/DailyMail, and OpenWebText datasets
+- **Automated Validation**: Performance results are validated for reasonableness
+- **Comprehensive Metrics**: Latency, throughput, success rates, and resource utilization
+- **Hardware Adaptation**: Automatically adapts to available hardware configuration
+- **Fallback Support**: Uses synthetic data when datasets are unavailable
+
+### Sample Benchmark Output
+```
+OpenInferencev2 Real-World Benchmark Report
+==================================================
+Dataset: wikitext
+------------------------------
+Batch Size   Avg Latency (s) P95 Latency (s) Throughput (t/s) Success Rate
+---------------------------------------------------------------------------
+1            0.016           0.020           188.2           100.00%
+2            0.031           0.032           195.6           100.00%
+4            0.062           0.062           195.0           100.00%
+
+Overall Average Latency: 0.036s
+Overall Average Throughput: 192.9 tokens/s
+Overall Success Rate: 100.00%
+```
 
 ---
 
@@ -410,9 +433,9 @@ spec:
 
 OpenInferencev2 includes production-grade hand-optimized CUDA kernels:
 
-- **FlashAttention**: Memory-efficient attention with O(N) complexity and 40% speedup
-- **Fused FFN**: Single-kernel feed-forward implementation with 2.3x performance gain
-- **KV Cache Optimization**: Advanced caching with 60% memory reduction and compression
+- **FlashAttention**: Memory-efficient attention with O(N) complexity for improved performance
+- **Fused FFN**: Single-kernel feed-forward implementation for optimized computation
+- **KV Cache Optimization**: Advanced caching with compression for memory efficiency
 - **Quantization Kernels**: High-performance INT8/INT4 operations with < 1% accuracy loss
 - **Speculative Decoding**: Tree-based speculation with 1.8x latency improvement
 
@@ -489,8 +512,8 @@ OpenInferencev2 has been designed to meet the highest standards of production sy
 ### Technical Achievements
 - **15/15 tests passing** with comprehensive coverage
 - **Near-linear multi-GPU scaling** up to 8 GPUs
-- **60% memory reduction** through advanced optimizations
-- **2.3x speedup** over baseline implementations
+- **Memory optimization** through advanced caching and management techniques
+- **Performance optimization** over baseline implementations
 - **< 1% accuracy loss** with quantization enabled
 
 ---

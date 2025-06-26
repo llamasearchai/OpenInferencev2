@@ -18,7 +18,7 @@ This major release represents a complete rewrite and optimization of the OpenInf
 - **Custom CUDA Kernels**: Hand-optimized FlashAttention, fused FFN operations, and memory-efficient attention
 - **Advanced Batching**: Dynamic batching with priority-based scheduling for optimal throughput
 - **Multi-GPU Support**: Tensor, pipeline, and MoE parallelism with near-linear scaling efficiency
-- **Memory Optimization**: Advanced KV cache management and memory pooling (60% memory reduction)
+- **Memory Optimization**: Advanced KV cache management and memory pooling for efficient resource utilization
 
 #### Performance Optimizations
 - **Mixed Precision**: FP16/BF16 support with automatic loss scaling and dynamic range optimization
@@ -42,20 +42,23 @@ This major release represents a complete rewrite and optimization of the OpenInf
 
 ### Performance Achievements
 
-- **2.3x performance improvement** over baseline implementations
-- **60% memory usage reduction** through advanced optimizations
-- **97.8% GPU utilization efficiency** with optimized batching
-- **< 1% accuracy loss** with quantization enabled
+- **Significant performance improvements** over baseline implementations
+- **Memory usage optimization** through advanced caching and management
+- **High GPU utilization efficiency** with optimized batching
+- **Minimal accuracy loss** with quantization enabled
 - **Near-linear scaling** across up to 8 GPUs
 
 ### Technical Specifications
 
-| Model Size | Batch Size | Throughput (tokens/s) | Latency P95 (ms) | Memory Usage (GB) | GPU Efficiency |
-|-----------|------------|----------------------|------------------|-------------------|----------------|
-| 7B        | 1          | 1,247                | 18.3             | 12.4              | 94.2%          |
-| 7B        | 32         | 15,892               | 24.7             | 14.8              | 97.8%          |
-| 13B       | 1          | 823                  | 28.9             | 22.1              | 92.1%          |
-| 70B       | 8          | 1,248                | 156.4            | 144.8             | 93.7%          |
+The system includes comprehensive benchmarking using real open-source datasets from Hugging Face. Performance varies based on hardware configuration, model size, and optimization settings.
+
+**Benchmark Features:**
+- Real dataset testing with WikiText-2, SQuAD, CNN/DailyMail, and OpenWebText
+- Automated performance validation and reporting
+- Hardware-specific optimization recommendations
+- Comprehensive metrics collection and analysis
+
+Run `python test_real_benchmarks.py` for system-specific performance measurements.
 
 ### Infrastructure
 

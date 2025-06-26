@@ -45,4 +45,11 @@ prometheus-client>=0.17.0
 
 # Optional GPU acceleration (CPU-only versions for compatibility)
 # For full GPU support, install CUDA versions separately
---extra-index-url https://download.pytorch.org/whl/cpu 
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+# Added from the code block
+pydantic>=2.0.0
+tqdm>=4.65.0
+pyyaml>=6.0
+typing-extensions>=4.5.0
+datasets>=2.14.0 
