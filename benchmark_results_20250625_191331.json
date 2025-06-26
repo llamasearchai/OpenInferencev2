@@ -1,0 +1,55 @@
+{
+  "metadata": {
+    "created_at": 1750904011.9600003,
+    "author": "Nik Jois",
+    "email": "nikjois@llamasearch.ai",
+    "version": "2.0.0"
+  },
+  "results": [
+    {
+      "dataset_name": "wikitext",
+      "batch_size": 1,
+      "avg_latency": 0.016080713272094725,
+      "p95_latency": 0.021799087524414062,
+      "avg_throughput": 188.72137886429846,
+      "total_throughput": 186.55888885264665,
+      "success_rate": 1.0,
+      "total_samples": 50,
+      "batches_processed": 10,
+      "timestamp": 1750904011.0327828
+    },
+    {
+      "dataset_name": "wikitext",
+      "batch_size": 2,
+      "avg_latency": 0.03059663772583008,
+      "p95_latency": 0.03124237060546875,
+      "avg_throughput": 196.14252606500452,
+      "total_throughput": 196.099978493216,
+      "success_rate": 1.0,
+      "total_samples": 50,
+      "batches_processed": 10,
+      "timestamp": 1750904011.339755
+    },
+    {
+      "dataset_name": "wikitext",
+      "batch_size": 4,
+      "avg_latency": 0.061812853813171385,
+      "p95_latency": 0.06325268745422363,
+      "avg_throughput": 194.15568210519018,
+      "total_throughput": 194.13437917410926,
+      "success_rate": 1.0,
+      "total_samples": 50,
+      "batches_processed": 10,
+      "timestamp": 1750904011.9589875
+    }
+  ],
+  "summary": {
+    "total_results": 3,
+    "datasets_tested": 1,
+    "avg_latency": 0.036163401603698735,
+    "avg_throughput": 193.00652901149772,
+    "avg_success_rate": 1.0,
+    "best_throughput": 196.14252606500452,
+    "lowest_latency": 0.016080713272094725
+  }
+}

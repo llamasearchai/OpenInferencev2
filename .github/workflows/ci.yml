@@ -1,4 +1,4 @@
-name: 🚀 OpenInferencev2 CI/CD Pipeline
+name: OpenInferencev2 CI/CD Pipeline
 
 on:
   push:
@@ -17,42 +17,42 @@ env:
 jobs:
   # Code Quality & Security
   quality:
-    name: 🔍 Code Quality & Security
+    name: Code Quality & Security
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 🐍 Setup Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: 📦 Install Dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt
 
-      - name: 🎨 Code Formatting Check
+      - name: Code Formatting Check
         run: |
           black --check --diff .
           isort --check-only --diff .
 
-      - name: 🔍 Linting
+      - name: Linting
         run: |
           flake8 --statistics --count
           mypy openinferencev2/ --ignore-missing-imports
 
-      - name: 🔒 Security Scan
+      - name: Security Scan
         run: |
           bandit -r openinferencev2/ -f json -o bandit-report.json
           safety check --json --output safety-report.json
         continue-on-error: true
 
-      - name: 📊 Upload Security Reports
+      - name: Upload Security Reports
         uses: actions/upload-artifact@v3
         if: always()
         with:
@@ -63,7 +63,7 @@ jobs:
 
   # Multi-Platform Testing
   test:
-    name: 🧪 Test Suite
+    name: Test Suite
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -78,25 +78,25 @@ jobs:
             python-version: '3.8'
 
     steps:
-      - name: 📥 Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python ${{ matrix.python-version }}
+      - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
-      - name: 📦 Install Dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -e .
 
-      - name: 🧪 Run Basic Tests
+      - name: Run Basic Tests
         run: python test_basic.py
 
-      - name: 🔬 Run Test Suite
+      - name: Run Test Suite
         run: |
           python -m pytest tests/ -v --tb=short \
             --cov=openinferencev2 \
@@ -104,7 +104,7 @@ jobs:
             --cov-report=term \
             --junitxml=junit.xml
 
-      - name: 📊 Upload Coverage
+      - name: Upload Coverage
         uses: codecov/codecov-action@v3
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
         with:
@@ -112,7 +112,7 @@ jobs:
           flags: unittests
           name: codecov-umbrella
 
-      - name: 📋 Upload Test Results
+      - name: Upload Test Results
         uses: actions/upload-artifact@v3
         if: always()
         with:
@@ -121,62 +121,62 @@ jobs:
 
   # GPU Testing (when available)
   gpu-test:
-    name: 🚀 GPU Tests
+    name: GPU Tests
     runs-on: [self-hosted, gpu]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-      - name: 📥 Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: ⚡ Check CUDA
+      - name: Check CUDA
         run: |
           nvidia-smi
           nvcc --version
 
-      - name: 📦 Install Dependencies
+      - name: Install Dependencies
         run: |
           pip install -r requirements.txt
           pip install -e .
 
-      - name: 🚀 Run GPU Tests
+      - name: Run GPU Tests
         run: |
           python -m pytest tests/ -v -m gpu --tb=short
           python final_demo.py
 
   # Performance Benchmarks
   benchmark:
-    name: 📊 Performance Benchmarks
+    name: Performance Benchmarks
     runs-on: ubuntu-latest
     needs: [quality, test]
     if: github.event_name == 'push'
     steps:
-      - name: 📥 Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: 📦 Install Dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt -r requirements-dev.txt
           pip install -e .
 
-      - name: 🏃 Run Benchmarks
+      - name: Run Benchmarks
         run: |
           python -m pytest tests/ -v -m benchmark \
             --benchmark-json=benchmark.json \
             --benchmark-histogram
 
-      - name: 📈 Store Benchmark Results
+      - name: Store Benchmark Results
         uses: benchmark-action/github-action-benchmark@v1
         with:
           tool: 'pytest'
@@ -186,17 +186,17 @@ jobs:
 
   # Docker Build & Test
   docker:
-    name: 🐳 Docker Build & Test
+    name: Docker Build & Test
     runs-on: ubuntu-latest
     needs: [quality, test]
     steps:
-      - name: 📥 Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: 🏗️ Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: 🔐 Login to GitHub Container Registry
+      - name: Login to GitHub Container Registry
         if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
@@ -204,7 +204,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 🏷️ Extract metadata
+      - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -216,7 +216,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=sha
 
-      - name: 🐳 Build and push Docker image
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -226,37 +226,37 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: 🧪 Test Docker Image
+      - name: Test Docker Image
         run: |
           docker run --rm ghcr.io/${{ github.repository }}:${{ github.sha }} \
             python test_basic.py
 
   # Documentation
   docs:
-    name: 📚 Documentation
+    name: Documentation
     runs-on: ubuntu-latest
     needs: [quality]
     steps:
-      - name: 📥 Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: 📦 Install Dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
           pip install -e .
 
-      - name: 📖 Build Documentation
+      - name: Build Documentation
         run: |
           sphinx-build -b html docs/ docs/_build/html
 
-      - name: 🌐 Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3
         with:
@@ -265,40 +265,40 @@ jobs:
 
   # Release Management
   release:
-    name: 🚀 Release
+    name: Release
     runs-on: ubuntu-latest
     needs: [quality, test, docker, docs]
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
-      - name: 📥 Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 🐍 Setup Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
-      - name: 📦 Install Dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install build twine
 
-      - name: 🏗️ Build Package
+      - name: Build Package
         run: python -m build
 
-      - name: 🔍 Check Package
+      - name: Check Package
         run: twine check dist/*
 
-      - name: 📦 Publish to PyPI
+      - name: Publish to PyPI
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: twine upload dist/*
 
-      - name: 📝 Create GitHub Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: dist/*
@@ -308,29 +308,29 @@ jobs:
 
   # Deployment (Production)
   deploy:
-    name: 🚀 Deploy to Production
+    name: Deploy to Production
     runs-on: ubuntu-latest
     needs: [release]
     if: startsWith(github.ref, 'refs/tags/v')
     environment: production
     steps:
-      - name: 📥 Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: ☸️ Deploy to Kubernetes
+      - name: Deploy to Kubernetes
         run: |
-          echo "🚀 Deploying to production Kubernetes cluster..."
+          echo "Deploying to production Kubernetes cluster..."
           # kubectl apply -f k8s/
           echo "✅ Deployment completed!"
 
   # Notification
   notify:
-    name: 📢 Notify
+    name: Notify
     runs-on: ubuntu-latest
     needs: [quality, test, docker, docs]
     if: always()
     steps:
-      - name: 📊 Report Status
+      - name: Report Status
         run: |
           if [[ "${{ needs.quality.result }}" == "success" && "${{ needs.test.result }}" == "success" ]]; then
             echo "✅ CI/CD Pipeline completed successfully!"
