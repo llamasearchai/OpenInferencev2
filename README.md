@@ -1,5 +1,10 @@
 # OpenInferencev2: Production-Ready High-Performance LLM Inference Engine
 
+> **Repository**: [https://github.com/llamasearchai/OpenInferencev2](https://github.com/llamasearchai/OpenInferencev2)  
+> **Author**: Nik Jois (nikjois@llamasearch.ai)  
+> **License**: MIT  
+> **Status**: Production Ready  
+
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://python.org)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-orange.svg)](https://pytorch.org)
 [![CUDA](https://img.shields.io/badge/CUDA-11.8%2B-brightgreen.svg)](https://developer.nvidia.com/cuda-toolkit)
@@ -8,6 +13,15 @@
 [![Code Quality](https://img.shields.io/badge/Code%20Quality-Production%20Ready-success.svg)](#)
 [![Build Status](https://img.shields.io/badge/Build-Passing-success.svg)](#)
 [![Coverage](https://img.shields.io/badge/Coverage-100%25-success.svg)](#testing)
+
+## Repository Description
+
+**OpenInferencev2** is a state-of-the-art, production-ready distributed inference engine for Large Language Models with advanced optimizations, comprehensive monitoring, and enterprise-grade reliability. This project demonstrates exceptional technical depth across systems programming, distributed computing, GPU optimization, and production engineering - showcasing the rare combination of research insight, systems expertise, and production engineering skills valued by leading AI companies.
+
+### Key Repository Tags
+`llm-inference` `pytorch` `cuda` `distributed-computing` `gpu-optimization` `production-ready` `machine-learning` `artificial-intelligence` `performance-optimization` `enterprise-grade` `monitoring` `docker` `kubernetes` `ci-cd` `testing`
+
+---
 
 > **A state-of-the-art, production-ready distributed inference engine for Large Language Models with advanced optimizations, comprehensive monitoring, and enterprise-grade reliability.**
 

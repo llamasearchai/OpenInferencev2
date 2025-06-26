@@ -321,16 +321,28 @@ class PerformanceMonitor:
         elif TORCH_AVAILABLE and torch.cuda.is_available():
             try:
                 for i in range(torch.cuda.device_count()):
-                    # PyTorch doesn't directly provide utilization, so we estimate
+                    # Get memory utilization
                     memory_allocated = torch.cuda.memory_allocated(i)
                     memory_reserved = torch.cuda.memory_reserved(i)
                     memory_total = torch.cuda.get_device_properties(i).total_memory
                     
-                    gpu_usage.append(50.0)  # Placeholder - actual utilization hard to get
-                    gpu_memory.append((memory_reserved / memory_total) * 100)
+                    # Estimate GPU utilization based on memory usage and recent activity
+                    memory_util = (memory_reserved / memory_total) * 100
+                    
+                    # Estimate utilization: if memory is being used, assume some utilization
+                    # This is a reasonable approximation when detailed metrics aren't available
+                    if memory_util > 10:
+                        # Scale utilization based on memory usage (rough approximation)
+                        estimated_util = min(memory_util * 0.8, 95.0)
+                    else:
+                        estimated_util = 0.0
+                    
+                    gpu_usage.append(estimated_util)
+                    gpu_memory.append(memory_util)
             except Exception as e:
                 self.logger.debug(f"Failed to get GPU metrics via PyTorch: {e}")
-                
+        
+        # If no GPUs found or accessible, return empty lists
         return gpu_usage, gpu_memory
         
     def _update_system_stats(self, metrics: SystemMetrics):
